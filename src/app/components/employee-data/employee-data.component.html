@@ -1,0 +1,240 @@
+<div class="text-center">
+<h2>Employee Assignment</h2>
+</div>
+<div class="row">
+    <div class="column">
+        <div class="card" *ngIf="users && users.length">
+        <button class="button" (click)="addEmployee()">Add Employee</button>
+
+        <input
+            type="text"
+            #input="ngModel"
+            [(ngModel)]="searchEmp"
+            (input)="searchData()"
+            placeholder="Search Employee..."
+            title="Search Employee"
+        />
+
+        <div *ngIf="!(users | filter: searchEmp).length">No result found!</div>
+
+        <div
+            class="loader"
+            *ngIf="isLoader && (users | filter: searchEmp).length"
+        ></div>
+        <table
+            class="table-bordered"
+            *ngIf="!isLoader && (users | filter: searchEmp).length"
+        >
+            <tr>
+            <th></th>
+            <th>
+                Comapny Name
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-up cursor-pointer"
+                id="companyNameAsc"
+                ></i>
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-down cursor-pointer sorting"
+                id="companyNameDesc"
+                ></i>
+            </th>
+            <th>
+                First Name
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-up cursor-pointer"
+                id="firstAsc"
+                ></i>
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-down cursor-pointer sorting"
+                id="firstDesc"
+                ></i>
+            </th>
+            <th>
+                Last Name
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-up cursor-pointer"
+                id="lastAsc"
+                ></i>
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-down cursor-pointer"
+                id="lastDesc"
+                ></i>
+            </th>
+            <th>
+                Age
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-up cursor-pointer"
+                id="ageAsc"
+                ></i>
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-down cursor-pointer"
+                id="ageDesc"
+                ></i>
+            </th>
+            <th>
+                Email
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-up cursor-pointer"
+                id="emailAsc"
+                ></i>
+                <i
+                appShortParams
+                (param)="setSortParams($event)"
+                class="fa fa-arrow-down cursor-pointer"
+                id="emailDesc"
+                ></i>
+            </th>
+            </tr>
+            <ng-container
+            *ngFor="
+                let user of users | filter: searchEmp | sort: direction:column:type;
+                let i = index
+            "
+            >
+            <tr>
+                <td (click)="isOpen(user)">
+                <i *ngIf="!user.isExpand" class="fa fa-plus cursor-pointer"></i>
+                <i *ngIf="user.isExpand" class="fa fa-minus cursor-pointer"></i>
+                </td>
+                <td>{{ user.companyName }}</td>
+                <td>{{ user.first }}</td>
+                <td>{{ user.last }}</td>
+                <td>{{ user.age }}</td>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr *ngIf="user.isExpand">
+                <td colspan="6">
+                <ul>
+                    <li class="text-initial">Gender : {{user.gender}}</li>
+                    <li class="text-initial">Salary : {{user.salary}}</li>
+                    <li class="text-initial">Location : {{user.location}}</li>
+                    <li class="text-initial">Designation : {{user.designation}}</li>
+                    <li class="text-initial">Work Type : {{user.workType}}</li>
+                </ul>
+                </td>
+            </tr>
+            </ng-container>
+        </table>
+    </div>
+</div>  
+
+<div id="myModal" class="modal">
+<div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <div>
+    <h2>Add Employee</h2>
+    <form [formGroup]="empForm" (ngSubmit)="onSubmit()">
+            <div>
+                <label>Company Name</label>
+                <input type="text" formControlName="companyName" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.companyName.errors }" />
+                <div *ngIf="submitted && f.companyName.errors" class="invalid-feedback">
+                    <div *ngIf="f.companyName.errors.required">Company Name is required</div>
+                </div>
+            </div>
+            <div>
+                <label>First Name</label>
+                <input type="text" formControlName="first" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.first.errors }" />
+                <div *ngIf="submitted && f.first.errors" class="invalid-feedback">
+                    <div *ngIf="f.first.errors.required">First Name is required</div>
+                </div>
+            </div>
+            <div>
+                <label>Last Name</label>
+                <input type="text" formControlName="last" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.last.errors }" />
+                <div *ngIf="submitted && f.last.errors" class="invalid-feedback">
+                    <div *ngIf="f.last.errors.required">Last Name is required</div>
+                </div>
+            </div>
+            <div>
+                <label>Age</label>
+                <input type="text" formControlName="age" (keypress)="numberOnly($event)" maxlength="3" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.age.errors }" />
+                <div *ngIf="submitted && f.age.errors" class="invalid-feedback">
+                    <div *ngIf="f.age.errors.required">Age is required</div>
+                </div>
+            </div>
+            <div>
+                <div class="radio-div">
+                    <label>Gender</label>
+                    <div>
+                        <input type="radio" value="male" formControlName="gender">
+                        <label class="container">Male
+                            <span class="checkmark"></span>
+                        </label>
+
+                        <input type="radio" value="female" formControlName="gender">
+                        <label class="container">Female
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label>Email</label>
+                <input type="text" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
+                <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                    <div *ngIf="f.email.errors.required">Email is required</div>
+                    <div *ngIf="f.email.errors.email">Email must be a valid email address</div>
+                </div>
+            </div>
+            <div>
+                <label>Salary</label>
+                <input type="text" formControlName="salary" (keypress)="numberOnly($event)" maxlength="20" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.salary.errors }" />
+                <div *ngIf="submitted && f.salary.errors" class="invalid-feedback">
+                    <div *ngIf="f.salary.errors.required">Salary is required</div>
+                </div>
+            </div>
+            <div>
+                <label>Location</label>
+                <input type="text" formControlName="location" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.location.errors }" />
+                <div *ngIf="submitted && f.location.errors" class="invalid-feedback">
+                    <div *ngIf="f.location.errors.required">Location is required</div>
+                </div>
+            </div>
+            <div>
+                <label>Designation</label>
+                <input type="text" formControlName="designation" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.designation.errors }" />
+                <div *ngIf="submitted && f.designation.errors" class="invalid-feedback">
+                    <div *ngIf="f.designation.errors.required">Designation is required</div>
+                </div>
+            </div>
+            <div class="radio-div">
+                <label>Work Type</label>
+                <div>
+                    <input type="radio" value="WFH" formControlName="workType">
+                    <label class="container">Work From Home
+                        <span class="checkmark"></span>
+                    </label>
+
+                    <input type="radio" value="WFO" formControlName="workType">
+                    <label class="container">Work From Office
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="button">Save</button>
+            </div>
+    </form>
+    </div>
+</div>
+</div>
+
+<div id="snackbar">Employee added successfully!</div>
